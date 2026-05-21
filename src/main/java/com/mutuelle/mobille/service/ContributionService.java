@@ -62,8 +62,7 @@ public class ContributionService {
             default -> throw new IllegalArgumentException("Type non supporté");
         }
 
-        // Récupérer le montant restant après paiement
-        BigDecimal remaining = getUnpaidAmount(memberAccount, type);
+        BigDecimal remaining = unpaidBefore.subtract(amount);
 
         // Création transaction
         Transaction transaction = Transaction.builder()

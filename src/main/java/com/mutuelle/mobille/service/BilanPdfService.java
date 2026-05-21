@@ -216,9 +216,9 @@ public class BilanPdfService {
             addSectionTitle(doc, "INTÉRÊTS & ACTIVITÉ");
             PdfPTable activite = buildTwoColumnTable();
             addRow(activite, "Intérêts calculés",       dto.getTotalInteretAmount(),    false, false);
-            addRow(activite, "Nb assistances",          BigDecimal.valueOf(dto.getTotalAssistanceCount()), false, false, "");
-            addRow(activite, "Nb cotisations solidarité", BigDecimal.valueOf(dto.getTotalSolidarityCount()), false, false, "");
-            addRow(activite, "Nb total transactions",   BigDecimal.valueOf(dto.getTotalTransactions()), false, false, "");
+            addRow(activite, "Nombre assistances",          BigDecimal.valueOf(dto.getTotalAssistanceCount()), false, false, "");
+            addRow(activite, "Nombre cotisations solidarité", BigDecimal.valueOf(dto.getTotalSolidarityCount()), false, false, "");
+            addRow(activite, "Nombre total transactions",   BigDecimal.valueOf(dto.getTotalTransactions()), false, false, "");
             addRow(activite, "Membres actifs",          BigDecimal.valueOf(dto.getActiveMembersCount()), false, false, "");
             doc.add(activite);
             doc.add(Chunk.NEWLINE);
@@ -292,9 +292,9 @@ public class BilanPdfService {
             addSectionTitle(doc, "INTÉRÊTS & ACTIVITÉ");
             PdfPTable activite = buildTwoColumnTable();
             addRow(activite, "Intérêts calculés (total)",  dto.getTotalInteretAmount(),    false, false);
-            addRow(activite, "Nb assistances (total)",     BigDecimal.valueOf(dto.getTotalAssistanceCount()), false, false);
-            addRow(activite, "Nb total transactions",      BigDecimal.valueOf(dto.getTotalTransactions()),    false, false);
-            addRow(activite, "Nb sessions",                BigDecimal.valueOf(dto.getSessionsCount()),        false, false);
+            addRow(activite, "Nombre assistances (total)",     BigDecimal.valueOf(dto.getTotalAssistanceCount()), false, false, "");
+            addRow(activite, "Nombre total transactions",      BigDecimal.valueOf(dto.getTotalTransactions()),    false, false, "");
+            addRow(activite, "Nombre sessions",                BigDecimal.valueOf(dto.getSessionsCount()),        false, false, "");
             addRow(activite, "Membres actifs",             BigDecimal.valueOf(dto.getActiveMembersCount()),   false, false);
             doc.add(activite);
             doc.add(Chunk.NEWLINE);

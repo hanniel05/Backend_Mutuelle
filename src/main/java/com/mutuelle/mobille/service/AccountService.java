@@ -373,7 +373,7 @@
             // Réduire la dette du membre
             memberAccount.setUnpaidRenfoulement(unpaid.subtract(amount));
 
-            // Charger le Renfoulement de l'exercice (source de vérité pour la ventilation)
+            // Charger le Renfoulement de l'exercice
             Renfoulement renfoulement = renfoulementRepository.findByExerciceId(exerciceId)
                     .orElseThrow(() -> new IllegalStateException(
                             "Aucun renfoulement trouvé pour l'exercice ID : " + exerciceId));
