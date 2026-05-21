@@ -478,6 +478,7 @@ public class BilanPdfService {
         Font f = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE);
         PdfPTable t = new PdfPTable(1);
         t.setWidthPercentage(100);
+        t.setSpacingBefore(12f);
         PdfPCell cell = new PdfPCell(new Phrase("  " + title, f));
         cell.setBackgroundColor(COLOR_SECTION);
         cell.setPadding(5);
