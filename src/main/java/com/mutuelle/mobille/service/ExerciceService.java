@@ -325,7 +325,7 @@ public class ExerciceService {
 
     @Transactional
     public void onExerciceEnded(Exercice exercice) {
-        if (exercice.getHistory() != null) return;
+        if (exerciceHistoryRepository.existsByExerciceId(exercice.getId())) return;
 
         AccountMutuelle mutuelleacc = accountService.getMutuelleGlobalAccount();
         List<Session> sessions = sessionRepository.findByExerciceId(exercice.getId());
@@ -387,8 +387,7 @@ public class ExerciceService {
                 .mutuelleBorrowAmount(mutuelleacc.getBorrowAmount())
                 .build();
 
-        exercice.setHistory(history);
-        exerciceRepository.save(exercice);
+        ExerciceHistory savedHistory = exerciceHistoryRepository.save(history);
 
         // ── Calcul du renfoulement ─────────────────────────────────────────────
         this.calculateAndAssignRenfoulementForExercice(exercice);
@@ -399,9 +398,9 @@ public class ExerciceService {
         if (renfoulementOpt.isPresent()) {
             var r = renfoulementOpt.get();
             renfoulementUnitaire = r.getUnitAmount() != null ? r.getUnitAmount() : BigDecimal.ZERO;
-            history.setTotalRenfoulementDistributed(r.getExpectedTotalAmount() != null ? r.getExpectedTotalAmount() : BigDecimal.ZERO);
-            history.setRenfoulementUnitAmount(renfoulementUnitaire);
-            exerciceHistoryRepository.save(history);
+            savedHistory.setTotalRenfoulementDistributed(r.getExpectedTotalAmount() != null ? r.getExpectedTotalAmount() : BigDecimal.ZERO);
+            savedHistory.setRenfoulementUnitAmount(renfoulementUnitaire);
+            exerciceHistoryRepository.save(savedHistory);
         }
 
         // ── Création des bilans membres par exercice ──────────────────────────

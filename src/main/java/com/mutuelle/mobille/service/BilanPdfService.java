@@ -71,7 +71,7 @@ public class BilanPdfService {
             addRow(decaissements, "Emprunt contracté",  dto.getEmpruntAmount(),      false, true);
             addRow(decaissements, "Intérêts calculés",  dto.getInteretAmount(),      false, true);
             addRow(decaissements, "Assistance reçue",   dto.getAssistanceReceived(), false, true);
-            addRow(decaissements, "Part agape session",  dto.getAgapeShare(),        false, true);
+            addRow(decaissements, "agape session",  dto.getAgapeShare(),        false, true);
             addTotalRow(decaissements, "TOTAL REÇU / DÛ", dto.getTotalRecu());
             doc.add(decaissements);
             doc.add(Chunk.NEWLINE);
