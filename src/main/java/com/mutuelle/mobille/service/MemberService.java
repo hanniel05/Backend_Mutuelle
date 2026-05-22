@@ -44,7 +44,7 @@ public class MemberService {
     @Transactional
     public MemberResponseDTO  registerMember(MemberRegisterDTO dto) {
         MutuelleConfig config = mutuelleConfigService.getCurrentConfig();
-        if (dto.getPhone() != "" && memberRepository.existsByPhone(dto.getPhone())) {
+        if (!dto.getPhone().isBlank() && memberRepository.existsByPhone(dto.getPhone())) {
             throw new IllegalArgumentException("Ce numéro de téléphone est déjà utilisé");
         }
         if (authUserRepository.existsByEmail(dto.getEmail())) {
@@ -125,7 +125,7 @@ public class MemberService {
     // ===========================================================================
     public MemberResponseDTO toResponseDTO(Member member) {
         AccountMember accountMember = member.getAccountMember();
-        AuthUser authUser = authUserRepository.findByUserRefId(member.getId())
+        AuthUser authUser = authUserRepository.findByUserRefIdAndRole(member.getId(), Role.MEMBER)
                 .orElse(null);
 
         String email = authUser != null ? authUser.getEmail() : null;
@@ -261,7 +261,7 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalStateException("Membre introuvable"));
 
-        AuthUser authUser = authUserRepository.findByUserRefId(memberId)
+        AuthUser authUser = authUserRepository.findByUserRefIdAndRole(memberId, Role.MEMBER)
                 .orElseThrow(() -> new IllegalStateException("Utilisateur d'authentification introuvable"));
 
         // Vérification ancien PIN
@@ -287,7 +287,7 @@ public class MemberService {
     public void updatePassword(PasswordUpdateDTO dto) {
         Long memberId = SecurityUtil.getCurrentUserRefId();
 
-        AuthUser authUser = authUserRepository.findByUserRefId(memberId)
+        AuthUser authUser = authUserRepository.findByUserRefIdAndRole(memberId, Role.MEMBER)
                 .orElseThrow(() -> new IllegalStateException("Utilisateur introuvable"));
 
         // Vérification mot de passe actuel
@@ -309,7 +309,7 @@ public class MemberService {
     @Transactional
     public MemberResponseDTO updateEmail(EmailUpdateDTO dto) {
         Long memberId = SecurityUtil.getCurrentUserRefId();
-        AuthUser authUser = authUserRepository.findByUserRefId(memberId)
+        AuthUser authUser = authUserRepository.findByUserRefIdAndRole(memberId, Role.MEMBER)
                 .orElseThrow();
 
         if (!passwordEncoder.matches(dto.getPassword(), authUser.getPasswordHash())) {
@@ -349,7 +349,7 @@ public class MemberService {
 
 
     public Optional<AuthUser> getAuthMember(Member member) {
-        return  authUserRepository.findByUserRefId(member.getId());
+        return authUserRepository.findByUserRefIdAndRole(member.getId(), Role.MEMBER);
     }
 
     @Transactional

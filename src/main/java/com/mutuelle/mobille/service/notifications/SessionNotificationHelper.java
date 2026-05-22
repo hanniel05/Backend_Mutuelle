@@ -8,6 +8,7 @@ import com.mutuelle.mobille.models.Member;
 import com.mutuelle.mobille.models.Session;
 import com.mutuelle.mobille.models.TypeAssistance;
 import com.mutuelle.mobille.models.account.AccountMember;
+import com.mutuelle.mobille.enums.Role;
 import com.mutuelle.mobille.models.auth.AuthUser;
 import com.mutuelle.mobille.repository.AuthUserRepository;
 import com.mutuelle.mobille.service.AccountService;
@@ -49,7 +50,7 @@ public class SessionNotificationHelper {
         List<AuthUser> validUsers = members.stream()
                 .filter(Objects::nonNull)
                 .filter(Member::isActive)
-                .map(m -> authUserRepo.findByUserRefId(m.getId()))
+                .map(m -> authUserRepo.findByUserRefIdAndRole(m.getId(), Role.MEMBER))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .filter(u -> u.getEmail() != null && !u.getEmail().isBlank())
