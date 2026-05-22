@@ -389,6 +389,9 @@ public class ExerciceService {
 
         ExerciceHistory savedHistory = exerciceHistoryRepository.save(history);
 
+        // Synchronise le côté inverse @OneToOne en mémoire (JPA ne le fait pas automatiquement)
+        exercice.setHistory(savedHistory);
+
         // ── Calcul du renfoulement ─────────────────────────────────────────────
         this.calculateAndAssignRenfoulementForExercice(exercice);
 
@@ -424,7 +427,7 @@ public class ExerciceService {
      *
      * @param exercice l'exercice qui vient de se terminer
      */
-    @jakarta.transaction.Transactional
+    @Transactional
     public void calculateAndAssignRenfoulementForExercice(Exercice exercice) {
 
         ExerciceHistory history = exercice.getHistory();
