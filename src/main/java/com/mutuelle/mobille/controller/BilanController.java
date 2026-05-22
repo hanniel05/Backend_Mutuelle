@@ -32,7 +32,7 @@ public class BilanController {
     // ─────────────────────────────────────────────────────────────────────────
 
     @GetMapping("/membre/{memberId}/session/{sessionId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER', 'MEMBER')")
     @Operation(summary = "Bilan financier d'un membre pour une session (JSON)")
     public ResponseEntity<ApiResponseDto<MemberSessionBilanDTO>> getMemberSessionBilan(
             @PathVariable Long memberId,
@@ -46,7 +46,7 @@ public class BilanController {
     }
 
     @GetMapping("/membre/{memberId}/session/{sessionId}/pdf")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER', 'MEMBER')")
     @Operation(summary = "Télécharger le bilan d'un membre pour une session (PDF)")
     public ResponseEntity<byte[]> getMemberSessionBilanPdf(
             @PathVariable Long memberId,
@@ -56,7 +56,7 @@ public class BilanController {
     }
 
     @GetMapping("/session/{sessionId}/membres")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Bilans de tous les membres pour une session (JSON)")
     public ResponseEntity<ApiResponseDto<List<MemberSessionBilanDTO>>> getAllMemberBilansBySession(
             @PathVariable Long sessionId) {
@@ -66,7 +66,7 @@ public class BilanController {
     }
 
     @GetMapping("/membre/{memberId}/sessions")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER', 'MEMBER')")
     @Operation(summary = "Tous les bilans session d'un membre (JSON)")
     public ResponseEntity<ApiResponseDto<List<MemberSessionBilanDTO>>> getMemberAllSessionBilans(
             @PathVariable Long memberId) {
@@ -79,7 +79,7 @@ public class BilanController {
     // ─────────────────────────────────────────────────────────────────────────
 
     @GetMapping("/membre/{memberId}/exercice/{exerciceId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER', 'MEMBER')")
     @Operation(summary = "Bilan financier d'un membre pour un exercice (JSON)")
     public ResponseEntity<ApiResponseDto<MemberExerciceBilanDTO>> getMemberExerciceBilan(
             @PathVariable Long memberId,
@@ -93,7 +93,7 @@ public class BilanController {
     }
 
     @GetMapping("/membre/{memberId}/exercice/{exerciceId}/pdf")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER', 'MEMBER')")
     @Operation(summary = "Télécharger le bilan d'un membre pour un exercice (PDF)")
     public ResponseEntity<byte[]> getMemberExerciceBilanPdf(
             @PathVariable Long memberId,
@@ -103,7 +103,7 @@ public class BilanController {
     }
 
     @GetMapping("/exercice/{exerciceId}/membres")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Bilans de tous les membres pour un exercice (JSON)")
     public ResponseEntity<ApiResponseDto<List<MemberExerciceBilanDTO>>> getAllMemberBilansByExercice(
             @PathVariable Long exerciceId) {
@@ -113,7 +113,7 @@ public class BilanController {
     }
 
     @GetMapping("/exercice/{exerciceId}/membres/pdf")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Télécharger la synthèse de tous les membres pour un exercice (PDF)")
     public ResponseEntity<byte[]> getAllMembersExercicePdf(@PathVariable Long exerciceId) {
         byte[] pdf = bilanPdfService.generateAllMembersExercicePdf(exerciceId);
@@ -121,7 +121,7 @@ public class BilanController {
     }
 
     @GetMapping("/membre/{memberId}/exercices")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER', 'MEMBER')")
     @Operation(summary = "Tous les bilans exercice d'un membre (JSON)")
     public ResponseEntity<ApiResponseDto<List<MemberExerciceBilanDTO>>> getMemberAllExerciceBilans(
             @PathVariable Long memberId) {
@@ -134,7 +134,7 @@ public class BilanController {
     // ─────────────────────────────────────────────────────────────────────────
 
     @GetMapping("/mutuelle/session/{sessionId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Bilan financier de la mutuelle pour une session (JSON)")
     public ResponseEntity<ApiResponseDto<SessionHistoryResponseDTO>> getMutuelleSessionBilan(
             @PathVariable Long sessionId) {
@@ -147,7 +147,7 @@ public class BilanController {
     }
 
     @GetMapping("/mutuelle/session/{sessionId}/pdf")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Télécharger le bilan de la mutuelle pour une session (PDF)")
     public ResponseEntity<byte[]> getMutuelleSessionBilanPdf(@PathVariable Long sessionId) {
         byte[] pdf = bilanPdfService.generateMutuelleSessionBilanPdf(sessionId);
@@ -159,7 +159,7 @@ public class BilanController {
     // ─────────────────────────────────────────────────────────────────────────
 
     @GetMapping("/mutuelle/exercice/{exerciceId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Bilan financier de la mutuelle pour un exercice (JSON)")
     public ResponseEntity<ApiResponseDto<ExerciceHistoryDto>> getMutuelleExerciceBilan(
             @PathVariable Long exerciceId) {
@@ -172,7 +172,7 @@ public class BilanController {
     }
 
     @GetMapping("/mutuelle/exercice/{exerciceId}/pdf")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Télécharger le bilan de la mutuelle pour un exercice (PDF)")
     public ResponseEntity<byte[]> getMutuelleExerciceBilanPdf(@PathVariable Long exerciceId) {
         byte[] pdf = bilanPdfService.generateMutuelleExerciceBilanPdf(exerciceId);

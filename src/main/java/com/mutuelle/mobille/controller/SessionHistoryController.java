@@ -23,7 +23,7 @@ public class SessionHistoryController {
     private final ExerciceRepository exerciceRepository;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Récupérer tout l'historique des sessions")
     public ResponseEntity<ApiResponseDto<List<SessionHistoryResponseDTO>>> getAllHistory() {
         List<SessionHistoryResponseDTO> history = sessionHistoryService.getAllHistory();
@@ -33,7 +33,7 @@ public class SessionHistoryController {
 
 
     @GetMapping("/by-exercice/{exerciceId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Récupérer l'historique des sessions d'un exercice")
     public ResponseEntity<ApiResponseDto<List<SessionHistoryResponseDTO>>> getHistoryByExercice(
             @PathVariable Long exerciceId) {
@@ -56,7 +56,7 @@ public class SessionHistoryController {
     }
 
     @GetMapping("/by-session/{sessionId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Récupérer l'historique d'une session spécifique")
     public ResponseEntity<ApiResponseDto<List<SessionHistoryResponseDTO>>> getHistoryBySession(
             @PathVariable Long sessionId) {

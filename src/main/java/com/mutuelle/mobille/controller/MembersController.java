@@ -36,7 +36,7 @@ public class MembersController {
     private final MemberService memberService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
     @Operation(summary = "Lister tous les membres actifs avec filtres optionnels")
     public ResponseEntity<ApiResponseDto<List<MemberResponseDTO>>> getAllMembers(
             // Filtres optionnels
@@ -136,7 +136,7 @@ public class MembersController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.userRefId")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER') or #id == principal.userRefId")
     @Operation(summary = "Voir le profil d'un membre (admin ou soi-même)")
     public ResponseEntity<ApiResponseDto<MemberResponseDTO>> getMemberById(@PathVariable Long id) {
         MemberResponseDTO member = memberService.getMemberById(id);
