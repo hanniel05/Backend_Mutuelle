@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.mutuelle.mobille.enums.StatusSession;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -303,6 +304,23 @@ public class ExerciceService {
                 .orElseThrow(() -> new RuntimeException("Exercice non trouvé : " + exerciceId));
 
         validateExerciceForClose(exercice);
+
+        // ── Vérifier la présence d'une session IN_PROGRESS ──
+        List<Session> sessionsEnCours = sessionRepository.findByExerciceIdAndStatus(
+                exercice.getId(), StatusSession.IN_PROGRESS);
+        if (!sessionsEnCours.isEmpty()) {
+            throw new IllegalStateException(
+                    "Veuillez d'abord clôturer la session ouverte."
+            );
+        }
+
+        // ── Annuler toutes les sessions PLANNED ──
+        List<Session> sessionsPlanifiees = sessionRepository.findByExerciceIdAndStatus(
+                exercice.getId(), StatusSession.PLANNED);
+        for (Session session : sessionsPlanifiees) {
+            sessionRepository.delete(session);
+            log.info("Session planifiée '{}' supprimée automatiquement lors de la clôture de l'exercice", session.getName());
+        }
 
         exercice.setEndDate(LocalDateTime.now());
         exercice.setStatus(StatusExercice.COMPLETED);
