@@ -1,6 +1,7 @@
 package com.mutuelle.mobille.models.account;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.mutuelle.mobille.enums.SolvencyStatus;
 import com.mutuelle.mobille.models.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -66,6 +67,15 @@ public class AccountMember {
     @Column(name = "borrow_session_id")
     private Long borrowSessionId;
 
+    // Nombre de cycles de pénalité déjà appliqués sur l'emprunt courant
+    @Column(name = "penalty_cycles_applied")
+    private Integer penaltyCyclesApplied = 0;
+
+    // Statut de solvabilité du membre
+    @Enumerated(EnumType.STRING)
+    @Column(name = "solvency_status", length = 20)
+    private SolvencyStatus solvencyStatus = SolvencyStatus.SOLVABLE;
+
     @Column(name = "is_active")
     private boolean isActive = true;
 
@@ -89,5 +99,35 @@ public class AccountMember {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Calcule la dette totale du membre.
+     * Dette = borrowAmount + unpaidRenfoulement + unpaidRegistrationAmount + unpaidSolidarityAmount
+     */
+    public BigDecimal getTotalDebt() {
+        BigDecimal debt = BigDecimal.ZERO;
+        
+        if (borrowAmount != null) {
+            debt = debt.add(borrowAmount);
+        }
+        if (unpaidRenfoulement != null) {
+            debt = debt.add(unpaidRenfoulement);
+        }
+        if (unpaidRegistrationAmount != null) {
+            debt = debt.add(unpaidRegistrationAmount);
+        }
+        if (unpaidSolidarityAmount != null) {
+            debt = debt.add(unpaidSolidarityAmount);
+        }
+        
+        return debt;
+    }
+
+    /**
+     * Vérifie si le membre est solvable selon le seuil donné.
+     */
+    public boolean isSolvable(BigDecimal threshold) {
+        return getTotalDebt().compareTo(threshold) <= 0;
     }
 }
