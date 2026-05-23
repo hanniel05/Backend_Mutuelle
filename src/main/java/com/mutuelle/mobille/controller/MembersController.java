@@ -6,8 +6,11 @@ import com.mutuelle.mobille.dto.member.MemberRegisterDTO;
 import com.mutuelle.mobille.dto.member.MemberResponseDTO;
 import com.mutuelle.mobille.dto.member.MemberStatusUpdateDTO;
 import com.mutuelle.mobille.dto.member.MemberUpdateDTO;
+import com.mutuelle.mobille.dto.member.RiskMemberDTO;
+import com.mutuelle.mobille.models.account.AccountMember;
 import com.mutuelle.mobille.service.AuthService;
 import com.mutuelle.mobille.service.MemberService;
+import com.mutuelle.mobille.service.SolvencyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -34,6 +37,7 @@ import java.util.List;
 public class MembersController {
 
     private final MemberService memberService;
+    private final SolvencyService solvencyService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
@@ -163,5 +167,86 @@ public class MembersController {
         return ResponseEntity.ok(
                 ApiResponseDto.ok(updatedMember, message)
         );
+    }
+
+    @GetMapping("/solvency/insolvent")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
+    @Operation(summary = "Récupérer la liste des membres insolvables (dette > 250 000 FCFA)")
+    public ResponseEntity<ApiResponseDto<List<RiskMemberDTO>>> getInsolventMembers() {
+        List<AccountMember> insolventMembers = solvencyService.getInsolventMembers();
+        List<RiskMemberDTO> dto = insolventMembers.stream()
+                .map(this::mapToRiskMemberDTO)
+                .toList();
+
+        return ResponseEntity.ok(ApiResponseDto.ok(
+                dto,
+                "Liste des " + dto.size() + " membres insolvables récupérée"
+        ));
+    }
+
+    @GetMapping("/solvency/at-risk")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRESIDENT', 'TRESORIER')")
+    @Operation(summary = "Récupérer la liste des membres à risque (80-100% du seuil d'insolvabilité)")
+    public ResponseEntity<ApiResponseDto<List<RiskMemberDTO>>> getRiskMembers() {
+        List<AccountMember> riskMembers = solvencyService.getRiskMembers();
+        List<RiskMemberDTO> dto = riskMembers.stream()
+                .map(this::mapToRiskMemberDTO)
+                .toList();
+
+        return ResponseEntity.ok(ApiResponseDto.ok(
+                dto,
+                "Liste des " + dto.size() + " membres à risque récupérée"
+        ));
+    }
+
+    @PostMapping("/solvency/evaluate/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Évaluer manuellement la solvabilité d'un membre")
+    public ResponseEntity<ApiResponseDto<RiskMemberDTO>> evaluateMemberSolvency(@PathVariable Long id) {
+        solvencyService.evaluateMemberSolvency(id);
+        AccountMember updated = memberService.getMemberAccountId(id);
+        RiskMemberDTO dto = mapToRiskMemberDTO(updated);
+
+        return ResponseEntity.ok(ApiResponseDto.ok(
+                dto,
+                "Solvabilité du membre évaluée"
+        ));
+    }
+
+    @PostMapping("/solvency/evaluate-all")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Évaluer la solvabilité de tous les membres")
+    public ResponseEntity<ApiResponseDto<String>> evaluateAllMembersSolvency() {
+        solvencyService.evaluateAllMembersSolvency();
+        return ResponseEntity.ok(ApiResponseDto.ok(
+                "OK",
+                "Évaluation de la solvabilité lancée pour tous les membres"
+        ));
+    }
+
+    private RiskMemberDTO mapToRiskMemberDTO(AccountMember accountMember) {
+        var member = accountMember.getMember();
+        var totalDebt = accountMember.getTotalDebt();
+        var threshold = memberService.getDebtThreshold();
+        var riskPercentage = threshold.compareTo(java.math.BigDecimal.ZERO) > 0
+                ? totalDebt.multiply(java.math.BigDecimal.valueOf(100))
+                .divide(threshold, 2, java.math.RoundingMode.HALF_UP)
+                : java.math.BigDecimal.ZERO;
+
+        return RiskMemberDTO.builder()
+                .memberId(member.getId())
+                .accountMemberId(accountMember.getId())
+                .memberName(member.getLastname() + " " + member.getFirstname())
+                .memberPhone(member.getPhone())
+                .totalDebt(totalDebt)
+                .debtThreshold(threshold)
+                .riskPercentage(riskPercentage)
+                .solvencyStatus(accountMember.getSolvencyStatus())
+                .isActive(accountMember.isActive())
+                .borrowAmount(accountMember.getBorrowAmount())
+                .unpaidRenfoulement(accountMember.getUnpaidRenfoulement())
+                .unpaidRegistrationAmount(accountMember.getUnpaidRegistrationAmount())
+                .unpaidSolidarityAmount(accountMember.getUnpaidSolidarityAmount())
+                .build();
     }
 }
