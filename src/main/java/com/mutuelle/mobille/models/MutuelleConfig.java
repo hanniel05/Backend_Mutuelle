@@ -42,6 +42,10 @@ public class MutuelleConfig {
     @Column(name = "loan_penalty_session_threshold", nullable = false)
     private Integer loanPenaltySessionThreshold = 3;
 
+    // Seuil de dette totale au-delà duquel un membre devient insolvable (en FCFA)
+    @Column(name = "debt_threshold_amount", nullable = false, precision = 14, scale = 2)
+    private BigDecimal debtThresholdAmount = new BigDecimal("250000.00");
+
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 

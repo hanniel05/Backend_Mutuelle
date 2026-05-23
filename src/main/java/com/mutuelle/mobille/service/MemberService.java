@@ -391,4 +391,25 @@ public class MemberService {
         return toResponseDTO(member);
     }
 
+    /**
+     * Récupère le compte d'un membre par son ID de AccountMember
+     */
+    public AccountMember getMemberAccountId(Long accountMemberId) {
+        return memberRepository.findAll()
+                .stream()
+                .filter(member -> member.getAccountMember() != null && 
+                        member.getAccountMember().getId().equals(accountMemberId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Compte membre introuvable avec l'ID : " + accountMemberId))
+                .getAccountMember();
+    }
+
+    /**
+     * Récupère le seuil de dette configuré dans la mutuelle
+     */
+    public BigDecimal getDebtThreshold() {
+        MutuelleConfig config = mutuelleConfigService.getCurrentConfig();
+        return config.getDebtThresholdAmount();
+    }
+
 }

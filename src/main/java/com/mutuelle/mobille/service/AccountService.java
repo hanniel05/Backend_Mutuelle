@@ -437,4 +437,22 @@
             return memberRepo.findByMemberId(memberId)
                     .orElseThrow(() -> new RuntimeException("Compte membre introuvable pour le membre ID : " + memberId));
         }
+
+        /**
+         * Ajoute un montant au renfoulement impayé du membre
+         */
+        @Transactional
+        public void addToUnpaidRenfoulement(AccountMember memberAccount, BigDecimal amount) {
+            if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Le montant à ajouter doit être positif");
+            }
+
+            BigDecimal currentUnpaid = memberAccount.getUnpaidRenfoulement();
+            if (currentUnpaid == null) {
+                currentUnpaid = BigDecimal.ZERO;
+            }
+
+            memberAccount.setUnpaidRenfoulement(currentUnpaid.add(amount));
+            memberRepo.save(memberAccount);
+        }
     }
